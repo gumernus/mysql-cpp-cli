@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 
 # name := "$(shell pwd | sed -r "s/.*\/([[:alnum:] _-]*)/\1/")"
-name := "own"
+name := "main"
 botan_inc := $(shell botan config cflags)
 botan_link := $(shell botan config libs)
 mysql_inc := -I/usr/include/mysql
