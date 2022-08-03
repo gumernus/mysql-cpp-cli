@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS developers (
+	id SERIAL PRIMARY KEY,
+	username VARCHAR(32) UNIQUE NOT NULL,
+	password CHAR(128) NOT NULL
+);
