@@ -2,11 +2,31 @@
 #include <stdlib.h>
 #include <fstream>
 #include <string>
+#include <tuple>
 #include <mysql++/mysql++.h>
 
 using std::cout;
 using std::cin;
 using std::string;
+
+class User {
+	private:
+		string session_token{""};
+	public:
+		string username{""};
+		string password{""};
+
+		User(string token) { session_token = token; }
+
+		void update_creds(string usr_name, string usr_pwd){ username = usr_name; password = usr_pwd; }
+
+		string get_token() { return session_token; }
+
+		void make_token() {
+			if (!username.empty() && !password.empty()) { session_token = username + password; } //hash etc..
+			else { cout << "username or password isn't availible for creation of session_token" << '\n'; }
+		}
+};
 
 char to_uppercase(char &in) {
 	if(in >= 'a' && in <= 'z') {
@@ -17,7 +37,7 @@ char to_uppercase(char &in) {
 
 void run_schema(mysqlpp::Connection &c) {
 	
-	std::ifstream schema("./src/schema.sql"); // because executable is in ../bin
+	std::ifstream schema("./src/schema.sql"); // because running from base dir
 	string query{""};
 
 	while(schema.good()) {
@@ -35,9 +55,8 @@ void run_schema(mysqlpp::Connection &c) {
 
 }
 
-string login(mysqlpp::Connection &c) {
-	string new_session_token = "lmao token";
-	return new_session_token;
+std::tuple<string, string> login(mysqlpp::Connection &c) {
+	return {"username-test", ""};
 }
 
 int main() {
@@ -45,11 +64,11 @@ int main() {
 	mysqlpp::Connection c{"database", "domain:port", "username", "password"}; //change this
 	if(c.connected() == true) { cout << "Connected to database" << "\n"; }
 	run_schema(c);
-	string session_token{""};
+	User user("");
 
 	char action;
 	do {
-		if(session_token.empty()) {
+		if(user.get_token().empty()) {
 			do {
 				cout << "(L)ogin, (Q)uit ";
 				cin >> action;
@@ -58,15 +77,18 @@ int main() {
 			} while(action != 'L' && action != 'Q');
 			switch(action) {
 				case 'L':
-					session_token = login(c);
+					auto [username, password] = login(c);
+					user.update_creds(username, password);
+					user.make_token();
+					cout << user.username << ", " << user.password << '\n';
 					break;
 				// future proof
 			}
 		
-		
 		}
 		else {
-			cout << session_token << '\n';
+			cout << user.get_token() << '\n';
+			action = 'Q'; 
 		}
 
 
