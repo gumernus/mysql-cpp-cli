@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <fstream>
 #include <string>
-#include <tuple>
 #include <mysql++/mysql++.h>
 
 using std::cout;
@@ -17,23 +16,15 @@ class User {
 		string password{""};
 
 		User(string token) { session_token = token; }
-
-		void update_creds(string usr_name, string usr_pwd){ username = usr_name; password = usr_pwd; }
-
 		string get_token() { return session_token; }
+
+		void login(mysqlpp::Connection &c) { username = "input-usrname"; password = "input-pwd"; } // hash password
 
 		void make_token() {
 			if (!username.empty() && !password.empty()) { session_token = username + password; } //hash etc..
 			else { cout << "username or password isn't availible for creation of session_token" << '\n'; }
 		}
 };
-
-char to_uppercase(char &in) {
-	if(in >= 'a' && in <= 'z') {
-		in -= ('a' - 'A');
-	}
-	return in;
-}
 
 void run_schema(mysqlpp::Connection &c) {
 	
@@ -55,10 +46,6 @@ void run_schema(mysqlpp::Connection &c) {
 
 }
 
-std::tuple<string, string> login(mysqlpp::Connection &c) {
-	return {"username-test", ""};
-}
-
 int main() {
 	
 	mysqlpp::Connection c{"database", "domain:port", "username", "password"}; //change this
@@ -73,20 +60,19 @@ int main() {
 				cout << "(L)ogin, (Q)uit ";
 				cin >> action;
 				cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-				to_uppercase(action);
+					if(action >= 'a' && action <= 'z') {
+						action -= ('a' - 'A');
+					}
 			} while(action != 'L' && action != 'Q');
+
 			switch(action) {
 				case 'L':
-					auto [username, password] = login(c);
-					user.update_creds(username, password);
+					user.login(c);
 					user.make_token();
 					cout << user.username << ", " << user.password << '\n';
 					break;
-				// future proof
 			}
-		
-		}
-		else {
+		} else {
 			cout << user.get_token() << '\n';
 			action = 'Q'; 
 		}
