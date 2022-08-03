@@ -9,7 +9,7 @@ using std::string;
 
 void run_schema(mysqlpp::Connection &c) {
 	
-	std::ifstream schema("./own_schema.sql");
+	std::ifstream schema("./src/schema.sql"); // because executable is in ../bin
 	string query{""};
 
 	while(schema.good()) {
@@ -28,7 +28,7 @@ void run_schema(mysqlpp::Connection &c) {
 }
 
 int main() {
-		
+	
 	mysqlpp::Connection c{"database", "domain:port", "username", "password"};
 	if(c.connected() == true) { cout << "Connected to database" << "\n"; }
 	run_schema(c);
