@@ -1,4 +1,4 @@
-# MySQL C++ Cli
+# MySQL C++ CLI
 
 ## 📦 Installation
 You will need some libraries. Mainly mysql++ but if you are on Debian, you can simply install it with this command:
