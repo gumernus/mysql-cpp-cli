@@ -9,8 +9,6 @@ class User {
 	public:
 		std::string username, password{""};
 
-		User(std::string token):session_token(token) {}
-
 		std::string get_token() { return session_token; }
 
 		void login(mysqlpp::Connection &c) { username = "input-usrname"; password = "input-pwd"; } // hash password
@@ -46,7 +44,7 @@ int main() {
 	mysqlpp::Connection c{"database", "domain:port", "username", "password"}; //change this
 	if(c.connected()) { std::cout << "INFO: connected to database \n"; }
 	run_schema(c);
-	User user{""};
+	User user;
 
 	char action;
 	do {
