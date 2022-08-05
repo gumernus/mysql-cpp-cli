@@ -46,7 +46,7 @@ int main() {
 	mysqlpp::Connection c{"database", "domain:port", "username", "password"}; //change this
 	if(c.connected()) { std::cout << "INFO: connected to database \n"; }
 	run_schema(c);
-	User user("");
+	User user{""};
 
 	char action;
 	do {
