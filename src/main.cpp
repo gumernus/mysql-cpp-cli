@@ -1,38 +1,33 @@
 #include <iostream>
-#include <stdlib.h>
 #include <fstream>
 #include <string>
 #include <mysql++/mysql++.h>
 
-using std::cout;
-using std::cin;
-using std::string;
-
 class User {
 	private:
-		string session_token{""};
+		std::string session_token{""};
 	public:
-		string username{""};
-		string password{""};
+		std::string username, password{""};
 
-		User(string token) { session_token = token; }
-		string get_token() { return session_token; }
+		User(std::string token):session_token(token) {}
+
+		std::string get_token() { return session_token; }
 
 		void login(mysqlpp::Connection &c) { username = "input-usrname"; password = "input-pwd"; } // hash password
 
 		void make_token() {
 			if (!username.empty() && !password.empty()) { session_token = username + password; } //hash etc..
-			else { cout << "username or password isn't availible for creation of session_token" << '\n'; }
+			else { std::cout << "ERROR: username or password isn't availible for creation of session_token \n"; }
 		}
 };
 
 void run_schema(mysqlpp::Connection &c) {
 	
 	std::ifstream schema("./src/schema.sql"); // because running from base dir
-	string query{""};
+	std::string query{""};
 
 	while(schema.good()) {
-		string tmp{""};
+		std::string tmp{""};
 		std::getline(schema, tmp);
 		query += tmp;
 	}
@@ -41,15 +36,15 @@ void run_schema(mysqlpp::Connection &c) {
 	mysqlpp::Query exec(c.query());
 	exec.execute(query);
 	transaction.commit();
-	cout << "Schema loaded" << "\n";
+	std::cout << "INFO: schema loaded \n";
 	return;
 
 }
 
 int main() {
-	
+
 	mysqlpp::Connection c{"database", "domain:port", "username", "password"}; //change this
-	if(c.connected() == true) { cout << "Connected to database" << "\n"; }
+	if(c.connected()) { std::cout << "INFO: connected to database \n"; }
 	run_schema(c);
 	User user("");
 
@@ -57,9 +52,9 @@ int main() {
 	do {
 		if(user.get_token().empty()) {
 			do {
-				cout << "(L)ogin, (Q)uit ";
-				cin >> action;
-				cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+				std::cout << "(L)ogin, (Q)uit ";
+				std::cin >> action;
+				std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 					if(action >= 'a' && action <= 'z') {
 						action -= ('a' - 'A');
 					}
@@ -69,11 +64,11 @@ int main() {
 				case 'L':
 					user.login(c);
 					user.make_token();
-					cout << user.username << ", " << user.password << '\n';
+					std::cout << user.username << ", " << user.password << '\n';
 					break;
 			}
 		} else {
-			cout << user.get_token() << '\n';
+			std::cout << user.get_token() << '\n';
 			action = 'Q'; 
 		}
 
