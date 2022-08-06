@@ -34,7 +34,20 @@ void run_schema(mysqlpp::Connection &c) {
 	mysqlpp::Query exec(c.query());
 	exec.execute(query);
 	transaction.commit();
-	std::cout << "INFO: schema loaded \n";
+	// will be in config file (down)
+	std::cout << R""""(
+
+
+	  __  __        _____  ____  _                                    _ _ 
+	 |  \/  |      / ____|/ __ \| |                                  | (_)
+	 | \  / |_   _| (___ | |  | | |  ______ ___ _ __  _ __ ______ ___| |_ 
+	 | |\/| | | | |\___ \| |  | | | |______/ __| '_ \| '_ \______/ __| | |
+	 | |  | | |_| |____) | |__| | |____   | (__| |_) | |_) |    | (__| | |
+	 |_|  |_|\__, |_____/ \___\_\______|   \___| .__/| .__/      \___|_|_|
+	          __/ |                            | |   | |                  
+	         |___/                             |_|   |_|
+	//////////////////////////////////////////////////////////////////////)"""";
+	std::cout << '\n';
 	return;
 
 }
@@ -42,36 +55,39 @@ void run_schema(mysqlpp::Connection &c) {
 int main() {
 
 	mysqlpp::Connection c{"database", "domain:port", "username", "password"}; //change this
-	if(c.connected()) { std::cout << "INFO: connected to database \n"; }
-	run_schema(c);
+	if(c.connected()) { run_schema(c); };
 	User user;
 
-	char action;
+	int action;
 	do {
 		if(user.get_token().empty()) {
 			do {
-				std::cout << "(L)ogin, (Q)uit ";
+				std::cout << "	1) Login \n";
+				std::cout << "	2) Signin \n";
+				std::cout << "	3) Quit \n";
+				std::cout << "	//////////////////////////////////////////////////////////////////////\n";
+				std::cout << "	: ";	
 				std::cin >> action;
 				std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-					if(action >= 'a' && action <= 'z') {
-						action -= ('a' - 'A');
-					}
-			} while(action != 'L' && action != 'Q');
+			} while(action != 1 && action != 2 && action != 3);
 
 			switch(action) {
-				case 'L':
+				case 1:
 					user.login(c);
 					user.make_token();
 					std::cout << user.username << ", " << user.password << '\n';
 					break;
+				case 2:
+					// Signin
+					break;
 			}
 		} else {
 			std::cout << user.get_token() << '\n';
-			action = 'Q'; 
+			action = 3; 
 		}
 
 
-	} while( action != 'Q');
+	} while( action != 3);
 
 	return 0;
 
